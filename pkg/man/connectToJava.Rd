@@ -2,7 +2,7 @@
 % Please edit documentation in R/j4rFunctions.R
 \name{connectToJava}
 \alias{connectToJava}
-\title{Connects to Java environment}
+\title{Connect to Java environment}
 \usage{
 connectToJava(port = 18011)
 }
