@@ -112,6 +112,18 @@ test_that("Removing all the java.arraylist object and synchronizing yield no obj
   expect_equal(nbObjects, 0)
 })
 
+#### Instantiating an Enum variable ####
+
+# In this example, the Enum variable Species.Fagus_sylvatica is instantiated. Then calling the method name() on
+# this enum returns:
+
+beechEnum <- createJavaObject("repicea.simulation.species.REpiceaSpecies$Species", "Fagus_sylvatica")
+resultNameFunction <- callJavaMethod(beechEnum, "name")
+
+test_that("Testing the method name() on a Species enum variable", {
+  expect_equal(resultNameFunction, "Fagus_sylvatica")
+})
+
 ####  Shutting down Java ####
 
 # The server is shutted down through the shutdownJava function:

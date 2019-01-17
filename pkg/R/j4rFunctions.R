@@ -19,11 +19,13 @@ cacheEnv <- new.env()
 #' The extension path must be set before calling this function. See setJavaExtensionPath.
 #'
 #' @param port the local port (the port is set to 18011 by default)
+#' @param local for debugging only (should be set to TRUE)
+#'
 #' @return nothing
 #'
 #' @export
-connectToJava <- function(port = 18011) {
-  local <- TRUE
+connectToJava <- function(port = 18011, local = TRUE) {
+#  local <- TRUE
   if (exists("j4rSocket", envir = cacheEnv)) {
     print("The object j4rSocket already exists! It seems R is already connected to the Java server.")
   } else {
@@ -52,7 +54,6 @@ connectToJava <- function(port = 18011) {
   assign("j4rSocket", utils::make.socket("localhost", port), envir = cacheEnv)
   utils::read.socket(.getMainSocket())
 }
-
 
 #'
 #' Set a path for jar extensions.

@@ -4,10 +4,12 @@
 \alias{connectToJava}
 \title{Connect to Java environment}
 \usage{
-connectToJava(port = 18011)
+connectToJava(port = 18011, local = TRUE)
 }
 \arguments{
 \item{port}{the local port (the port is set to 18011 by default)}
+
+\item{local}{for debugging only (should be set to TRUE)}
 }
 \value{
 nothing
