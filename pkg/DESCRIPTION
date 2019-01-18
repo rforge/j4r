@@ -1,6 +1,6 @@
 Package: J4R
 Type: Package
-Title: Create Java objects and execute Java methods
+Title: Create Java Objects and Execute Java Methods
 Version: 0.1.0
 Author: Mathieu Fortin
 Maintainer: Mathieu Fortin <mathieu.fortin.re@gmail.com>
