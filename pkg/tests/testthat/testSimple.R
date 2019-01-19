@@ -124,6 +124,16 @@ test_that("Testing the method name() on a Species enum variable", {
   expect_equal(resultNameFunction, "Fagus_sylvatica")
 })
 
+#### Instantiating 200 enum variables ####
+
+enumValue <- rep("alive", 200)
+enumList <- createJavaObject("repicea.simulation.covariateproviders.treelevel.TreeStatusProvider$StatusClass", enumValue)
+
+test_that("Instantiating a 200 times an enum variable", {
+  expect_equal(length(enumList), 200)
+})
+
+
 ####  Shutting down Java ####
 
 # The server is shutted down through the shutdownJava function:

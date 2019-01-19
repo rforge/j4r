@@ -13,6 +13,14 @@
 cacheEnv <- new.env()
 
 #'
+#' Length of the buffer when reading from the socket connection.
+#'
+#' The buffer has a length of 100Kb by default.
+#'
+#' @export
+bufferLength <- 100000
+
+#'
 #' Connect to Java environment
 #'
 #' This function connects the R environment to a gateway server that runs in Java.
@@ -52,7 +60,7 @@ connectToJava <- function(port = 18011, local = TRUE) {
   }
   print(paste("Connecting on port", port))
   assign("j4rSocket", utils::make.socket("localhost", port), envir = cacheEnv)
-  utils::read.socket(.getMainSocket())
+  utils::read.socket(.getMainSocket(), maxlen = bufferLength)
 }
 
 #'
@@ -130,12 +138,13 @@ setJavaExtensionPath <- function(path) {
 #' @export
 createJavaObject <- function(class, ...) {
   parameters <- list(...)
+  .checkParameterLength(parameters)
   command <- paste("create", class, sep=";")
   if (length(parameters) > 0) {
     command <- paste(command, .marshallCommand(parameters), sep=";")
   }
   utils::write.socket(.getMainSocket(), command)
-  callback <- utils::read.socket(.getMainSocket(), maxlen = 10000)
+  callback <- utils::read.socket(.getMainSocket(), maxlen = bufferLength)
   if(regexpr("Exception", callback) >= 0) {
     stop(callback)
   } else {
@@ -209,13 +218,24 @@ createJavaObject <- function(class, ...) {
 #' @export
 callJavaMethod <- function(javaObject, methodName, ...) {
   parameters <- list(...)
+  .checkParameterLength(parameters)
   command <- paste("method", paste("java.object",.translateJavaObject(javaObject),sep=""), methodName, sep=";")
   if (length(parameters) > 0) {
     command <- paste(command, .marshallCommand(parameters), sep=";")
   }
   utils::write.socket(.getMainSocket(), command)
-  callback <- utils::read.socket(.getMainSocket(), maxlen=10000)
+  callback <- utils::read.socket(.getMainSocket(), maxlen=bufferLength)
   return(.processCallback(callback))
+}
+
+.checkParameterLength <- function(parameters) {
+  if (length(parameters) > 0) {
+    for (i in 1:length(parameters)) {
+      if (length(parameters[[i]]) >  200) {
+        stop("The J4R package allows for vectors than do not exceed 200 in length. You can use a loop instead.")
+      }
+    }
+  }
 }
 
 .processCallback <- function(callback) {
@@ -332,7 +352,7 @@ callJavaGC <- function(currentEnv = NULL) {
     }
   }
   utils::write.socket(.getMainSocket(), command)
-  callback <- utils::read.socket(.getMainSocket(), maxlen=10000)
+  callback <- utils::read.socket(.getMainSocket(), maxlen=bufferLength)
   return(.processCallback(callback))
 }
 
