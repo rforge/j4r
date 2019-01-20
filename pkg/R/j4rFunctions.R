@@ -196,7 +196,8 @@ createJavaObject <- function(class, ...) {
 #' There is no need to cast a particular parameter to a super class. Actually, the Java server tries to find the method
 #' that best matches the types of the parameters
 #'
-#' @param javaObject this should be either a list of instances or a single instance of java.object.
+#' @param source this should be either a java.arraylist instance or a single java.object instance for non-static methods or
+#' a string representing the Java class name in case of static method
 #' @param methodName the name of the method
 #' @param ... the parameters of the method
 #' @return It depends on the method. It can return a primitive type (or a vector of primitive), a Java instance (or a list of Java instances) or nothing at all.
@@ -216,10 +217,14 @@ createJavaObject <- function(class, ...) {
 #' @seealso \href{https://sourceforge.net/p/repiceasource/wiki/J4R/}{J4R webpage}
 #'
 #' @export
-callJavaMethod <- function(javaObject, methodName, ...) {
+callJavaMethod <- function(source, methodName, ...) {
   parameters <- list(...)
   .checkParameterLength(parameters)
-  command <- paste("method", paste("java.object",.translateJavaObject(javaObject),sep=""), methodName, sep=";")
+  if (.getClass(source) %in% c("java.object", "java.arraylist")) {   ### non-static method
+    command <- paste("method", paste("java.object", .translateJavaObject(source), sep=""), methodName, sep=";")
+  } else {  ### static method
+    command <- paste("method", paste("java.class", source, sep=""), methodName, sep=";")
+  }
   if (length(parameters) > 0) {
     command <- paste(command, .marshallCommand(parameters), sep=";")
   }

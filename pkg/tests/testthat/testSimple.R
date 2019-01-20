@@ -133,6 +133,16 @@ test_that("Instantiating a 200 times an enum variable", {
   expect_equal(length(enumList), 200)
 })
 
+#### Calling static method several time ####
+
+result <- callJavaMethod("java.lang.Math", "sqrt", c(3.5,4))
+result
+
+test_that("Call on the sqrt method in the Math class", {
+  expect_equal(result[1], 3.5^.5)
+  expect_equal(result[2], 4^.5)
+})
+
 
 ####  Shutting down Java ####
 
