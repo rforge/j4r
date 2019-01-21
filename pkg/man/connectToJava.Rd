@@ -9,7 +9,7 @@ connectToJava(port = 18011, local = TRUE)
 \arguments{
 \item{port}{the local port (the port is set to 18011 by default)}
 
-\item{local}{for debugging only (should be set to TRUE)}
+\item{local}{for debugging only (should be left as is)}
 }
 \value{
 nothing

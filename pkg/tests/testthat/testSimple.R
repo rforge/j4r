@@ -124,13 +124,13 @@ test_that("Testing the method name() on a Species enum variable", {
   expect_equal(resultNameFunction, "Fagus_sylvatica")
 })
 
-#### Instantiating 200 enum variables ####
+#### Instantiating many enum variables ####
 
-enumValue <- rep("alive", 200)
+enumValue <- rep("alive", J4R::maxVectorLength)
 enumList <- createJavaObject("repicea.simulation.covariateproviders.treelevel.TreeStatusProvider$StatusClass", enumValue)
 
-test_that("Instantiating a 200 times an enum variable", {
-  expect_equal(length(enumList), 200)
+test_that(paste("Instantiating", J4R::maxVectorLength,  "times an enum variable", sep=" "), {
+  expect_equal(length(enumList), J4R::maxVectorLength)
 })
 
 #### Calling static method several time ####
@@ -143,6 +143,15 @@ test_that("Call on the sqrt method in the Math class", {
   expect_equal(result[2], 4^.5)
 })
 
+
+#### Creating a null instance ####
+
+result <- createJavaObject("java.util.ArrayList", isNullObject = TRUE)
+result
+
+test_that("Create a NullWrapper instance", {
+  expect_equal(result$class, "repicea.lang.codetranslator.REnvironment$NullWrapper")
+})
 
 ####  Shutting down Java ####
 

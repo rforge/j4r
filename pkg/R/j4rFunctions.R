@@ -21,19 +21,26 @@ cacheEnv <- new.env()
 bufferLength <- 100000
 
 #'
+#' Maximum length of the vector in the parameters.
+#'
+#' A maximum length of the vector is set in order to avoid buffer size issues when reading
+#'
+#' @export
+maxVectorLength <- 700
+
+#'
 #' Connect to Java environment
 #'
 #' This function connects the R environment to a gateway server that runs in Java.
 #' The extension path must be set before calling this function. See setJavaExtensionPath.
 #'
 #' @param port the local port (the port is set to 18011 by default)
-#' @param local for debugging only (should be set to TRUE)
+#' @param local for debugging only (should be left as is)
 #'
 #' @return nothing
 #'
 #' @export
 connectToJava <- function(port = 18011, local = TRUE) {
-#  local <- TRUE
   if (exists("j4rSocket", envir = cacheEnv)) {
     print("The object j4rSocket already exists! It seems R is already connected to the Java server.")
   } else {
@@ -116,6 +123,7 @@ setJavaExtensionPath <- function(path) {
 #'
 #' @param class the Java class of the object (e.g. java.util.ArrayList)
 #' @param ... the parameters to be passed to the constructor of the object
+#' @param isNullObject a logical that indicates whether the instance should be null (by default it is set to FALSE)
 #' @return a java.object or java.list instance in the R environment
 #' @examples
 #' ### starting Java
@@ -136,10 +144,14 @@ setJavaExtensionPath <- function(path) {
 #' @seealso \href{https://sourceforge.net/p/repiceasource/wiki/J4R/}{J4R webpage}
 #'
 #' @export
-createJavaObject <- function(class, ...) {
+createJavaObject <- function(class, ..., isNullObject=FALSE) {
   parameters <- list(...)
   .checkParameterLength(parameters)
-  command <- paste("create", class, sep=";")
+  firstCommand <- "create"
+  if (isNullObject) {
+    firstCommand <- "createnull"
+  }
+  command <- paste(firstCommand, class, sep=";")
   if (length(parameters) > 0) {
     command <- paste(command, .marshallCommand(parameters), sep=";")
   }
@@ -236,8 +248,8 @@ callJavaMethod <- function(source, methodName, ...) {
 .checkParameterLength <- function(parameters) {
   if (length(parameters) > 0) {
     for (i in 1:length(parameters)) {
-      if (length(parameters[[i]]) >  200) {
-        stop("The J4R package allows for vectors than do not exceed 200 in length. You can use a loop instead.")
+      if (length(parameters[[i]]) >  maxVectorLength) {
+        stop(paste("The J4R package allows for vectors than do not exceed", maxVectorLength, "in length. You can use a loop instead.", sep=" "))
       }
     }
   }
