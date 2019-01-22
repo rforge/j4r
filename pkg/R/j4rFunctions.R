@@ -258,7 +258,9 @@ callJavaMethod <- function(source, methodName, ...) {
 .processCallback <- function(callback) {
   if(regexpr("Exception", callback) >= 0) {
     stop(callback)
-  } else if (regexpr("JavaObject", callback) >= 0) {
+  } else if (regexpr("JavaObject", callback) >= 0) {  ## a single Java object
+    returnObject <- .createFakeJavaObject(callback)
+  } else if (regexpr("JavaList", callback) >= 0 && regexpr("@", callback) >= 0) { ## a list of Java objects
     returnObject <- .createFakeJavaObject(callback)
   } else if (regexpr("RequestReceivedAndProcessed", callback) >= 0) {
     returnObject <- NULL
