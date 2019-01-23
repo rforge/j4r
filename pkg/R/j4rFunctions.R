@@ -276,22 +276,58 @@ callJavaMethod <- function(source, methodName, ...) {
     str <- substring(str, 10)
   }
   inputList <- strsplit(str,",")[[1]]
-  outputVector <- c()
+  # outputVector <- c()
+  # for (i in 1:length(inputList)) {
+  #   str <- inputList[i]
+  #   if (regexpr("numeric", str) == 1) { # starts with numeric
+  #     outputVector <- c(outputVector, as.numeric(substring(str,8)))
+  #   } else if (regexpr("integer", str) == 1) { # starts with integer
+  #     outputVector <- c(outputVector, as.integer(substring(str,8)))
+  #   } else if (regexpr("logical", str) == 1) { # starts with logical
+  #     outputVector <- c(outputVector, as.logical(substring(str,8)))
+  #   } else if (regexpr("character", str) == 1) { # starts with character
+  #     outputVector <- c(outputVector, as.character(substring(str, 10)))
+  #   } else {
+  #     stop("This primitive type is not recognized!")
+  #   }
+  # }
+  outputVector <- list()
   for (i in 1:length(inputList)) {
     str <- inputList[i]
     if (regexpr("numeric", str) == 1) { # starts with numeric
-      outputVector <- c(outputVector, as.numeric(substring(str,8)))
+      outputVector[[i]] <- as.numeric(substring(str,8))
     } else if (regexpr("integer", str) == 1) { # starts with integer
-      outputVector <- c(outputVector, as.integer(substring(str,8)))
+      outputVector[[i]] <- as.integer(substring(str,8))
     } else if (regexpr("logical", str) == 1) { # starts with logical
-      outputVector <- c(outputVector, as.logical(substring(str,8)))
+      outputVector[[i]] <- as.logical(substring(str,8))
     } else if (regexpr("character", str) == 1) { # starts with character
-      outputVector <- c(outputVector, as.character(substring(str, 10)))
+      outputVector[[i]] <- as.character(substring(str, 10))
     } else {
       stop("This primitive type is not recognized!")
     }
   }
-  return(outputVector)
+
+  return(.convertListToVectorIfPossible(outputVector))
+}
+
+
+.convertListToVectorIfPossible <- function(myList) {
+  if (length(myList) > 0) {
+    outputVec <- c()
+    for (i in 1:length(myList)) {
+      if (i == 1) {
+        refClass <- class(myList[[i]])
+      } else {
+        if (class(myList[[i]]) != refClass) {
+          return(myList)
+        }
+      }
+      outputVec <- c(outputVec, myList[[i]])
+    }
+    return(outputVec)
+  } else {
+    return(myList)
+  }
 }
 
 .createFakeJavaObject <- function(str) {
@@ -375,3 +411,10 @@ callJavaGC <- function(currentEnv = NULL) {
   return(.processCallback(callback))
 }
 
+# getAllValuesFromList <- function(object) {
+#   if (.getClass(object) != "java.object") {
+#     stop("The object must be an instance of java.object")
+#   } else {
+#     object$class ### check if it implements List
+#   }
+# }
